@@ -3,7 +3,7 @@
 
 import { sql } from "drizzle-orm";
 import {
-  index,
+  boolean,
   pgTableCreator,
   serial,
   timestamp,
@@ -16,19 +16,22 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `todo-base-template_${name}`);
-
-export const posts = createTable(
-  "post",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt", { withTimezone: true }),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
+export const createTable = pgTableCreator(
+  (name) => `todo-base-template_${name}`,
 );
+
+export const todosTable = createTable("todo", {
+  id: serial("id").primaryKey(),
+  desc: varchar("name", { length: 256 }).notNull(),
+  isCompleted: boolean("isCompleted").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export type InsertTodo = typeof todosTable.$inferInsert;
+export type SelectTodo = typeof todosTable.$inferSelect;
