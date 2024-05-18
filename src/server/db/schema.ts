@@ -23,7 +23,7 @@ export const createTable = pgTableCreator(
 export const todosTable = createTable("todo", {
   id: serial("id").primaryKey(),
   desc: varchar("name", { length: 256 }).notNull(),
-  isCompleted: boolean("isCompleted").default(false),
+  isCompleted: boolean("isCompleted").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

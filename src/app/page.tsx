@@ -1,32 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/server/db";
-import { todosTable } from "@/server/db/schema";
-import { revalidatePath } from "next/cache";
 import { TodoItem } from "./_components/todo-item";
+import { addTodo, getTodos } from "./_actions/todos";
 
 export default async function HomePage() {
-  async function addTodo(formData: FormData) {
-    "use server";
-
-    const desc = formData.get("desc") as string;
-
-    const addedTodo = await db.insert(todosTable).values({
-      desc,
-    });
-
-    console.log("AddedTodo: ", addedTodo);
-
-    revalidatePath("/");
-  }
-
-  async function getTodos() {
-    "use server";
-
-    const todos = await db.select().from(todosTable);
-    return todos;
-  }
-
   const todos = await getTodos();
 
   return (
@@ -47,9 +24,11 @@ export default async function HomePage() {
           </span>
         </form>
 
-        {todos.map((todo) => (
-          <TodoItem todo={todo} key={todo.id} />
-        ))}
+        <div className="flex w-full flex-col items-center justify-center gap-4">
+          {todos.map((todo) => (
+            <TodoItem todo={todo} key={todo.id} />
+          ))}
+        </div>
       </div>
     </main>
   );
