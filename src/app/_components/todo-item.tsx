@@ -7,21 +7,21 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { deleteTodo, updateTodo } from "../_actions/todos";
+import { deleteTodoAction, updateTodoDescAction } from "./actions";
+import { type BaseSyntheticEvent, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type SelectTodo } from "@/server/db/schema";
 import { useToast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { SelectTodo } from "@/server/db/schema";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { TrashIcon } from "lucide-react";
-import { useEffect } from "react";
+import { XIcon } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = z.object({
-  desc: z.string(),
+  desc: z.string().min(3, "Description must be at least 3 characters"),
   isCompleted: z.boolean(),
 });
 
@@ -38,13 +38,20 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
     },
   });
 
-  const { watch } = form;
+  const {
+    watch,
+    formState: { errors },
+  } = form;
 
-  async function onSubmit(data: Form, e: any) {
-    console.log("Target: ", e.target);
+  const { mutate: mutate_update_todo } = useMutation({
+    mutationFn: updateTodoDescAction,
+  });
+
+  async function onSubmit(data: Form, e?: BaseSyntheticEvent) {
+    console.log("Target: ", e?.target);
     console.log("On Submit: ", data);
     if (todo.desc !== data.desc) {
-      await updateTodo({
+      mutate_update_todo({
         id: todo.id,
         desc: data.desc,
       });
@@ -56,43 +63,54 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
     }
   }
 
-  const { mutate: mutate_update_todo } = useMutation({
-    mutationFn: deleteTodo,
-  });
-
   const { mutate: mutate_delete_todo } = useMutation({
-    mutationFn: deleteTodo,
+    mutationFn: deleteTodoAction,
   });
 
   useEffect(() => {
     const subs = watch(({ isCompleted }) => {
-      console.log("Watch1: ", isCompleted);
       if (isCompleted) {
-        console.log("Watch2: ", isCompleted);
-        mutate_update_todo(todo.id);
+        mutate_delete_todo(todo.id, {
+          onSuccess: () =>
+            toast({
+              title: "Hurray!",
+              description: "Todo completed!",
+            }),
+        });
       }
     });
 
     return () => subs.unsubscribe();
   }, [watch]);
 
+  useEffect(() => {
+    if (errors.desc) {
+      toast({
+        title: "Error",
+        description: errors.desc.message,
+      });
+    }
+  }, [errors.desc]);
+
+  console.log("TodoItem");
+
   return (
     <Form key={todo.id} {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full max-w-xl items-center gap-4 rounded-md bg-white/10 px-6 py-4 text-black"
+        className="flex w-full max-w-xl items-center gap-4 rounded-md bg-white/10  px-6 py-4 text-black"
       >
         <FormField
           name="isCompleted"
           control={form.control}
           render={({ field }) => {
             return (
-              <FormItem>
+              <FormItem className="flex items-center">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="rounded-md border-2 border-white/50 p-3"
+                    className="h-6 w-6 rounded-md border-2"
                   />
                 </FormControl>
                 <FormMessage />
@@ -106,28 +124,30 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
           control={form.control}
           render={({ field }) => {
             return (
-              <FormItem className="flex-1">
+              <FormItem className="relative flex-1">
                 <FormControl>
-                  <Input
-                    type="text"
-                    onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === "Enter") {
-                        e.currentTarget.blur();
-                      }
-                    }}
-                    className="rounded-md border-none bg-transparent font-bold text-white focus-visible:ring-0"
-                    {...field}
-                  />
+                  <>
+                    <Input
+                      type="text"
+                      onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === "Enter") {
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      className="rounded-md border-none bg-transparent font-bold text-white "
+                      {...field}
+                    />
+                  </>
                 </FormControl>
-                <FormMessage />
               </FormItem>
             );
           }}
         />
 
         <Button
+          type="button"
           variant="ghost"
-          className="p-0"
+          className="group p-0"
           onClick={() =>
             mutate_delete_todo(todo.id, {
               onSuccess: () => {
@@ -139,10 +159,7 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
             })
           }
         >
-          <TrashIcon
-            className="aspect-square text-[hsl(280,35%,49%)]"
-            fill="rgb(255 255 255 / 0.1)"
-          />
+          <XIcon className="w-10 text-[hsl(280,35%,49%)] group-hover:text-[hsl(280,80%,76%)]" />
         </Button>
       </form>
     </Form>

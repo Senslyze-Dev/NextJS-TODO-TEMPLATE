@@ -29,6 +29,6 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
 
-#E Note
+## Note
 
 At the time of development drizzle-kit's latest version had some bugs thus sticked to previous version, but update drizzle-orm to the latest as they'd recently added the $onUpdate feature.

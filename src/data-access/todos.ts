@@ -1,23 +1,23 @@
-"use server";
+import "server-only";
 
-import { db } from "@/server/db";
-import { asc, eq } from "drizzle-orm";
-import { SelectTodo, todosTable } from "@/server/db/schema";
+import { type SelectTodo, todosTable } from "@/server/db/schema";
 import { revalidatePath } from "next/cache";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/server/db";
 
 export async function getTodos() {
   const todos = await db.select().from(todosTable).orderBy(asc(todosTable.id));
   return todos;
 }
 
-export async function addTodo(formData: FormData) {
-  const desc = formData.get("desc") as string;
-
-  const addedTodo = await db.insert(todosTable).values({
+export async function createTodo(desc: string) {
+  const [addedTodo] = await db.insert(todosTable).values({
     desc,
   });
 
   console.log("AddedTodo: ", addedTodo);
+
+  return addedTodo;
 
   revalidatePath("/");
 }
