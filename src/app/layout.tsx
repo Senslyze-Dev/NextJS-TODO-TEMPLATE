@@ -1,7 +1,8 @@
 import { Providers } from "@/lib/providers";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { Inter as FontSans } from "next/font/google";
 
@@ -22,16 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={cn(
-          "bg-background min-h-screen font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
-        <Providers>{children}</Providers>
-        <Toaster />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={cn(
+            "bg-background min-h-screen font-sans antialiased",
+            fontSans.variable,
+          )}
+        >
+          <Providers>{children}</Providers>
+          <Toaster />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

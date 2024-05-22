@@ -26,7 +26,7 @@ function Todos({
 }
 
 export default async function HomePage() {
-  const todos = await getTodosAction();
+  const { data: todos } = await getTodosAction({});
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
@@ -37,7 +37,7 @@ export default async function HomePage() {
 
         <FormInput />
 
-        <Todos todos={todos} />
+        {todos ? <Todos todos={todos} /> : <></>}
       </div>
     </main>
   );

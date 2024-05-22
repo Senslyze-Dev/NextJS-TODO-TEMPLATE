@@ -6,44 +6,46 @@ import {
   updateTodoDescUseCase,
   deleteTodoUseCase,
 } from "@/use-cases/todos";
+import { authenticatedAction } from "@/lib/safe-action";
 import { todoSchema } from "./validations";
 import { revalidatePath } from "next/cache";
-import { type z } from "zod";
+import { z } from "zod";
 
-export async function createTodoAction(data: z.infer<typeof todoSchema>) {
-  // do auth
+export const createTodoAction = authenticatedAction(
+  todoSchema.omit({
+    id: true,
+    isCompleted: true,
+  }),
+  async ({ desc }) => {
+    await createTodoUseCase(desc);
 
-  const newTodo = todoSchema.parse(data);
+    revalidatePath("/");
+  },
+);
 
-  await createTodoUseCase(newTodo.desc);
-
-  revalidatePath("/");
-}
-
-export async function getTodosAction() {
-  // do auth
-
+export const getTodosAction = authenticatedAction(z.object({}), async () => {
   return await getTodosUseCase();
-}
+});
 
-export async function updateTodoDescAction({
-  id,
-  desc,
-}: {
-  id: number;
-  desc: string;
-}) {
-  // do auth
+export const updateTodoDescAction = authenticatedAction(
+  todoSchema.omit({
+    isCompleted: true,
+  }),
+  async ({ id, desc }) => {
+    await updateTodoDescUseCase(id, desc);
 
-  await updateTodoDescUseCase(id, desc);
+    revalidatePath("/");
+  },
+);
 
-  revalidatePath("/");
-}
+export const deleteTodoAction = authenticatedAction(
+  todoSchema.omit({
+    desc: true,
+    isCompleted: true,
+  }),
+  async ({ id }) => {
+    await deleteTodoUseCase(id);
 
-export async function deleteTodoAction(id: number) {
-  // do auth
-
-  await deleteTodoUseCase(id);
-
-  revalidatePath("/");
-}
+    revalidatePath("/");
+  },
+);
