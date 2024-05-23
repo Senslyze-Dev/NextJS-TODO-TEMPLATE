@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "db:gen": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev --turbo",

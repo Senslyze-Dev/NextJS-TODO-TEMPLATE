@@ -14,7 +14,7 @@ function Todos({
   return (
     <div
       className={cn(
-        "flex h-[50vh] w-full flex-col items-center gap-4 overflow-y-scroll",
+        "flex h-[70vh] w-full flex-col items-center gap-4 overflow-y-auto",
         className,
       )}
     >
@@ -26,18 +26,18 @@ function Todos({
 }
 
 export default async function HomePage() {
-  const { data: todos } = await getTodosAction({});
+  const { data } = await getTodosAction({});
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+      <div className="container flex flex-col items-center justify-center gap-12 px-4">
         <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
           T3 <span className="text-[hsl(280,100%,70%)]">Todo</span> App
         </h1>
 
         <FormInput />
 
-        {todos ? <Todos todos={todos} /> : <></>}
+        {data?.todos ? <Todos todos={data.todos} /> : <></>}
       </div>
     </main>
   );

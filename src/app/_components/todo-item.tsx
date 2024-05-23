@@ -70,13 +70,16 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
   useEffect(() => {
     const subs = watch(({ isCompleted }) => {
       if (isCompleted) {
-        mutate_delete_todo(todo.id, {
-          onSuccess: () =>
-            toast({
-              title: "Hurray!",
-              description: "Todo completed!",
-            }),
-        });
+        mutate_delete_todo(
+          { id: todo.id },
+          {
+            onSuccess: () =>
+              toast({
+                title: "Hurray!",
+                description: "Todo completed!",
+              }),
+          },
+        );
       }
     });
 
@@ -149,14 +152,17 @@ export function TodoItem({ todo }: { todo: SelectTodo }) {
           variant="ghost"
           className="group p-0"
           onClick={() =>
-            mutate_delete_todo(todo.id, {
-              onSuccess: () => {
-                toast({
-                  title: "Success",
-                  description: "Todo deleted succesfully!",
-                });
+            mutate_delete_todo(
+              { id: todo.id },
+              {
+                onSuccess: () => {
+                  toast({
+                    title: "Success",
+                    description: "Todo deleted succesfully!",
+                  });
+                },
               },
-            })
+            )
           }
         >
           <XIcon className="w-10 text-[hsl(280,35%,49%)] group-hover:text-[hsl(280,80%,76%)]" />

@@ -26,7 +26,9 @@ export function FormInput() {
   const form = useForm<Form>({
     resolver: zodResolver(todoSchema),
     defaultValues: {
+      id: 0,
       desc: "",
+      isCompleted: false,
     },
   });
 
