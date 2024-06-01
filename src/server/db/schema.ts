@@ -22,8 +22,8 @@ export const createTable = pgTableCreator(
 
 export const usersTable = createTable("user", {
   id: varchar("id", { length: 256 }).primaryKey(),
-  email: varchar("email", { length: 256 }).notNull(),
-  password: varchar("password", { length: 256 }).notNull(),
+  email: varchar("email", { length: 256 }),
+  password: varchar("password", { length: 256 }),
   createdAt: varchar("createdAt", { length: 256 }).notNull(),
 });
 

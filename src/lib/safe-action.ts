@@ -5,7 +5,8 @@ class CustomError extends Error {}
 
 export const authenticatedAction = createSafeActionClient({
   async middleware() {
-    const { userId } = auth();
+    // const { userId } = auth();
+    const userId = "user_2gowieTacXFZR0PypfIAiUbNXlU"
     console.log("userId:", userId);
 
     if (!userId) {
