@@ -42,11 +42,23 @@ export function FormInput() {
     mutate_create_todo(
       { desc: data.desc },
       {
-        onSuccess() {
-          toast({
-            title: "Success",
-            description: "Todo created successfully!",
-          });
+        onSettled(data) {
+          if (data?.serverError) {
+            toast({
+              title: "Error",
+              description: data?.serverError,
+            });
+          } else if (data?.validationErrors) {
+            toast({
+              title: "Error",
+              description: "Invalid data!",
+            });
+          } else {
+            toast({
+              title: "Success",
+              description: "Todo created successfully!",
+            });
+          }
         },
       },
     );
